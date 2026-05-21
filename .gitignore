@@ -21,3 +21,9 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/terraform.tfvars
 terraform/*.tfvars
+
+# Combined Terraform
+combined/terraform/.terraform/
+combined/terraform/.terraform.lock.hcl
+combined/terraform/terraform.tfstate
+combined/terraform/terraform.tfstate.backup

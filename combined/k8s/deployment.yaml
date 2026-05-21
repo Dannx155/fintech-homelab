@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-risk-api
+  namespace: fintech
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: churn-risk-api
+  template:
+    metadata:
+      labels:
+        app: churn-risk-api
+    spec:
+      containers:
+      - name: churn-risk-api
+        image: churn-risk-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
