@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-risk-api
+  namespace: fintech
+spec:
+  selector:
+    app: churn-risk-api
+  ports:
+  - port: 5000
+    targetPort: 5000
+  type: ClusterIP
