@@ -1,0 +1,15 @@
+# Docker
+app/churn-risk-api.tar
+*.tar
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# K3s / Kubernetes
+*.log
+
+# IDE
+.idea/
+.vscode/
