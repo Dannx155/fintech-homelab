@@ -105,11 +105,44 @@ The most production-representative approach. Terraform creates the namespace (in
 
 ---
 
+## Monitoring
+
+Grafana and Prometheus are deployed via Helm into the `fintech` namespace alongside the application.
+
+```powershell
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install monitoring prometheus-community/kube-prometheus-stack --namespace fintech
+```
+
+Access Grafana:
+
+```powershell
+kubectl port-forward -n fintech svc/monitoring-grafana 3000:80
+```
+
+Open `http://localhost:3000`. Credentials are stored as a Kubernetes secret:
+
+```powershell
+kubectl get secret --namespace fintech monitoring-grafana -o jsonpath="{.data.admin-password}" | ForEach-Object { [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($_)) }
+```
+
+The dashboard monitors the `fintech` namespace with three panels:
+
+- **Running Pods** — total pods registered in the namespace
+- **Churn Risk API - Ready** — green when the application is up, red if it crashes
+- **Container Restarts per Pod** — `churn-risk-api` shows 0 restarts; `node-exporter` crashes repeatedly because Docker Desktop does not expose host metrics, a known environment limitation that does not affect the application
+
+![Grafana Dashboard](docs/grafana-dashboard.png)
+
 ## What I learned
 
 Setting this up on WSL with no external network access forced a deeper understanding of how Kubernetes pulls images, how Terraform resolves providers, and what actually happens under the hood when a namespace gets stuck in `Terminating` for 90 minutes.
 
-The combined approach clarified something that wasn't obvious initially: Terraform and kubectl aren't alternatives. In production, Terraform provisions the platform, Kubernetes runs the workloads. Using them as alternatives here was a stepping stone to understanding why they belong together.
+Working through three deployment approaches clarified something that documentation doesn't make obvious: Terraform and kubectl are not alternatives. A common production pattern is Terraform for cluster provisioning and infrastructure, Kubernetes manifests for application deployment. Using them separately first, then combining them, made this concrete rather than theoretical.
+
+
+Adding Grafana and Prometheus via Helm revealed another layer: observability is infrastructure too. The dashboard exposes a real environment limitation: `node-exporter` crashes on Docker Desktop because host metrics are not accessible, while the application itself runs stably with zero restarts. Knowing the difference between a monitoring failure and an application failure matters.
 
 ---
 
